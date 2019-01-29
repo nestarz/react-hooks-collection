@@ -17,11 +17,10 @@ import { useFaceApiDetection } from './react-hooks-collection/face-api.js';
 
 const Demo = () => {
   const videoRef = useRef();
-  const [detections, setFaceApiInput] = useFaceApiDetection(videoRef, {
-                                                    detector: "TinyFaceDetector", 
-                                                    path: "/assets/faceapi/models"});
-  
-  console.log(detections)
+  const [detections, setFaceApiInput] = useFaceApiDetection(videoRef, 
+                                                    faceapi.loadTinyFaceDetectorModel, 
+                                                    "/assets/faceapi/models"
+                                                    );
   return (
     <div>
       <video width={"640"} height={"360"} ref={videoRef} controls autoplay>
