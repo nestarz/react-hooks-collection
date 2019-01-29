@@ -18,7 +18,8 @@ import { useFaceApiDetection } from './react-hooks-collection/face-api.js';
 const Demo = () => {
   const videoRef = useRef();
   const [detections, setFaceApiInput] = useFaceApiDetection(videoRef);
-
+  
+  console.log(detections)
   return (
     <div>
       <video width={"640"} height={"360"} ref={videoRef} controls autoplay>
@@ -26,6 +27,8 @@ const Demo = () => {
         <source src="http://clips.vorwaerts-gmbh.de/VfE.webm"      type="video/webm" />
         <source src="http://clips.vorwaerts-gmbh.de/VfE.ogv"       type="video/ogg"  />
       </video>
+      <div>X: {detections ? detections.box.x : 0}</div>
+      <div>Y: {detections ? detections.box.y : 0}</div>
     </div>
   );
 };
