@@ -15,10 +15,10 @@ React state hook that load model and provide detections according to an input so
 import { useRef } from 'react';
 import { useFaceApiDetection } from './react-hooks-collection/face-api.js';
 
+const modelPath = "/assets/faceapi/models";
 const Demo = () => {
   const videoRef = useRef();
-  const model = faceapi.SsdMobilenetv1;
-  const modelPath = "/assets/faceapi/models";
+  const [model, setModel] = useState(faceapi.SsdMobilenetv1);
   const [detections, setFaceApiInput] = useFaceApiDetection(videoRef, model, modelPath);
   return (
     <div>
