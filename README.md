@@ -17,7 +17,9 @@ import { useFaceApiDetection } from './react-hooks-collection/face-api.js';
 
 const Demo = () => {
   const videoRef = useRef();
-  const [detections, setFaceApiInput] = useFaceApiDetection(videoRef);
+  const [detections, setFaceApiInput] = useFaceApiDetection(videoRef, {
+                                                    detector: "TinyFaceDetector", 
+                                                    path: "/assets/faceapi/models"});
   
   console.log(detections)
   return (
