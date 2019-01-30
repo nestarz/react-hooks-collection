@@ -4,19 +4,23 @@ import * as faceapi from 'face-api.js';
 async function fetchFaces(input) {
     //console.log("detecting faces...");
     return await faceapi
-    .detectSingleFace(input, new faceapi.TinyFaceDetectorOptions())
+        .detectSingleFace(input, new faceapi.TinyFaceDetectorOptions()).withFaceExpressions()
     //.withFaceLandmarks();
 }
 
-async function loadModel() {
+async function loadModel(model) {
     //console.log("loading model...")
-    return await faceapi.loadTinyFaceDetectorModel('/assets/faceapi/models');
+    return Promise.all([
+        faceapi.loadTinyFaceDetectorModel('/assets/faceapi/models'),
+        faceapi.loadFaceExpressionModel('/assets/faceapi/models')
+    ].map((p) => p.catch(err => ({ error: err })))
+    )
 }
 
 export const useFaceApiDetection = (interval) => {
     const [modelReady, setModelReady] = useState(false);
-    const [inputRef, setFaceApiInput] = useState(null); 
-    const [detections, setDetections] = useState(null);
+    const [inputRef, setFaceApiInput] = useState(null);
+    const [results, setResults] = useState(null);
     const [intervalId, setIntervalId] = useState(null);
     useEffect(() => {
         loadModel().then(w => setModelReady(true))
@@ -27,7 +31,7 @@ export const useFaceApiDetection = (interval) => {
             clearInterval(intervalId);
             const id = setInterval(async () => {
                 await fetchFaces(inputRef)
-                    .then(detections => setDetections(detections))
+                    .then(results => setResults(results))
                     .catch(err => console.log("error", err))
             }, interval);
             setIntervalId(id);
@@ -35,14 +39,15 @@ export const useFaceApiDetection = (interval) => {
         }
     }, [inputRef, modelReady]);
     useEffect(() => {
-        if (detections) {
-            detections.lookAt = {
-                x: (detections.relativeBox.x + detections.relativeBox.width) / 2,
-                y: (detections.relativeBox.y + detections.relativeBox.height) / 2,
-                z: 0}
+        if (results && results.detection) {
+            results.detection.lookAt = {
+                x: (results.detection.relativeBox.x + results.detection.relativeBox.width) / 2,
+                y: (results.detection.relativeBox.y + results.detection.relativeBox.height) / 2,
+                z: 0
+            }
         }
-    }, [detections])
-    return [detections, setFaceApiInput];
+    }, [results])
+    return [results, setFaceApiInput];
 }
 
 function clearCanvas(canvas) {
@@ -51,15 +56,15 @@ function clearCanvas(canvas) {
     var w = canvas.width;
     canvas.width = 1;
     canvas.width = w;
-  }
+}
 
-export const useFaceApiOverlay = (detections, canvasRef) => {
+export const useFaceApiOverlay = (results, canvasRef) => {
     useEffect(() => {
-        if (detections && canvasRef.current) {
+        if (results && results.detection && canvasRef.current) {
             const canvas = canvasRef.current;
             clearCanvas(canvas)
-            const detectionsForSize = faceapi.resizeResults(detections, { width: canvas.width, height: canvas.height })
+            const detectionsForSize = faceapi.resizeResults(results.detection, { width: canvas.width, height: canvas.height })
             faceapi.drawDetection(canvas, detectionsForSize, { withScore: true })
         }
-    }, [detections, canvasRef.current])
+    }, [results, canvasRef.current])
 }
