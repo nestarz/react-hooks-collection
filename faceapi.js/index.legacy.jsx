@@ -9,15 +9,16 @@ async function fetchFaces(input) {
     //.withFaceLandmarks();
 }
 
-async function loadModel(models) {
-    return Promise.all(models.forEach(model => {
-        model.loadModel(model.path)
-    }).map((p) => {
-      p.catch(err => ({ error: err }))
-    }))
+async function loadModel(model) {
+    //console.log("loading model...")
+    return Promise.all([
+        faceapi.loadTinyFaceDetectorModel('/assets/faceapi/models'),
+        faceapi.loadFaceExpressionModel('/assets/faceapi/models')
+    ].map((p) => p.catch(err => ({ error: err })))
+    )
 }
 
-export const useFaceApiDetection = (faceApiConfig) => {
+export const useFaceApiDetection = (interval) => {
     const [modelReady, setModelReady] = useState(false);
     const [inputRef, setFaceApiInput] = useState(null);
     const [results, setResults] = useState(null);

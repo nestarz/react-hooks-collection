@@ -1,6 +1,30 @@
 # react-hooks-collection
 Personal collection of react hooks
 
+## usePrinting
+Provide binding to trigger event before/after print. For example, we can use it to refit our graph network to the new layout.
+
+### Usage
+
+```jsx
+import React, { useState, useEffect } from 'react';
+import { usePrinting } from 'hooks/usePrinting';
+import Graph from 'react-graph-vis';
+import { graph, options, events } from "./graph";
+
+const Index = ({ height, width, className }) => {
+  const [network, setNetwork] = useState(null);
+  const printing = usePrinting()
+  useEffect(() => { if (network) network.fit() }, [printing]);
+  return <Graph
+      graph={graph}
+      options={options}
+      events={events}
+      getNetwork={network => setNetwork(network)}
+    />
+};
+```
+
 ## faceapi.js hooks
 Provide bindings with faceapi.js repository.
 
