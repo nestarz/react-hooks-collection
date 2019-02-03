@@ -68,3 +68,12 @@ export const useFaceApiOverlay = (results, canvasRef) => {
         }
     }, [results, canvasRef.current])
 }
+
+export const findBestExpression = (expressions) => {
+    if(typeof expressions == "undefined" || 
+        expressions == null || 
+        expressions.length == 0) {
+        return []
+    }
+    
+}
